@@ -1,0 +1,10 @@
+{
+  "name": "game",
+  "description": "",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": "~4.9.1",
+    "socket.io": "~1.1.0",
+    "dualshock-controller": "~0.6.7"
+  }
+}
