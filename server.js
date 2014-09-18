@@ -1,9 +1,11 @@
-var app        = require('express')();
+var express    = require('express');
+var app        = express(); 
 var http       = require('http').Server(app);
 var io         = require('socket.io')(http);
 var dualShock  = require('dualshock-controller');
-var path       = require('path');
 var controller = dualShock();
+
+app.use(express.static(__dirname + '/public'));
 
 io.on('connection', function(socket) {
     console.log('a user connected');
@@ -17,7 +19,7 @@ events.forEach(function(eventName) {
 });
 
 app.get('/', function(req, res) {
-    res.sendFile('index.html', { root : path.join(__dirname, 'public') });
+    res.sendFile('index.html', { root : __dirname + ' /public' });
 });
 
 http.listen(3000, function() {
