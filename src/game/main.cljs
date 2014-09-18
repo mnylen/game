@@ -1,4 +1,7 @@
 (ns game.main)
 
 (defn ^:export main []
-  (.write js/document "<p>Hello, world!</p>"))
+  (let [socket (io/connect)]
+    (doseq [event ["left:move" "right:move"]]
+      (.on socket event (fn [data]
+                          (.log js/console event (pr-str data)))))))

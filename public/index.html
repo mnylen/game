@@ -7,16 +7,6 @@
   <script type="text/javascript">
     game.main.main();
   </script>
-  <script>
-    var socket = io();
-
-    var events = ['error', 'left:move', 'right:move'];
-    events.forEach(function(eventName) {
-        socket.on(eventName, function(data) {
-            console.log(eventName, data);
-        });
-    });
-  </script>
 </head>
 <body>
 </body>

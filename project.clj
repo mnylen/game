@@ -4,6 +4,7 @@
   :plugins [[lein-cljsbuild "1.0.3"]] 
   :cljsbuild {:builds [{:source-paths ["src"]
                         :compiler {:output-to "public/resources/javascript/main.js"
+                                   :externs ["lib/socket.io-externs.js"]
                                    :optimizations :whitespace 
                                    :pretty-print true}}]}
   )
