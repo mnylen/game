@@ -5,6 +5,5 @@
   :cljsbuild {:builds [{:source-paths ["src"]
                         :compiler {:output-to "public/resources/javascript/main.js"
                                    :externs ["lib/socket.io-externs.js"]
-                                   :optimizations :whitespace 
-                                   :pretty-print true}}]}
-  )
+                                   :optimizations :whitespace
+                                   :pretty-print true}}]})
