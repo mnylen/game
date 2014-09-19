@@ -12,11 +12,12 @@
     
     (canvas/context-2d canvas-elem)))
 
-(defn draw [ctx objects]
+(defn draw [ctx objects interpolation]
   (canvas/clear-rect ctx 0 0 1024 768)
 
   (doseq [object objects]
-    (let [[width height] (:dimensions object)
-          [x     y]      (:position object)]
+    (let [[width height]    (:dimensions object)
+          [pos-x pos-y]     (:position object)
+          [speed-x speed-y] (:speed object)]
 
-      (canvas/fill-rect ctx x y width height))))
+      (canvas/fill-rect ctx (+ pos-x (* speed-x interpolation)) (+ pos-y (* speed-y interpolation)) width height))))

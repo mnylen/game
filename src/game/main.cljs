@@ -1,12 +1,17 @@
 (ns game.main
   (:require [game.util :refer [log trace ]]
-            [game.draw :as renderer]))
+            [game.draw :as renderer]
+            [game.constants :refer [ticks-per-second skip-ticks max-frames-skipped max-speed]]))
 
 (enable-console-print!)
 
-(def max-speed 128)     ; max speed in "units"
-(def pixels-per-unit 1) ; how many pixels there are per "unit"
-(def target-fps 30)    ; target fps
+(defn- millis-since-epoch []
+  (.getTime (js/Date.)))
+
+(def start-time (millis-since-epoch))
+
+(defn- tick-count []
+  (- (millis-since-epoch) start-time))
 
 (defn- init-controls []
   (let [socket (io/connect)]
@@ -14,34 +19,33 @@
       (.on socket event (fn [data]
                           (.log js/console event (pr-str data)))))))
 
+(def initial-world {:objects [{:type       :dragon 
+                              :state      :flying
+                              :position   [512 384]
+                              :dimensions [30 30]
+                              :speed      [1 0]}]})
 
-(def initial-state {:objects [{:type       :dragon 
-                               :state      :flying
-                               :position   [512 384]
-                               :dimensions [30 30]
-                               :speed      [max-speed 0]}]})
+(defn- update-world [delta world]
+  (let [update-position (fn [delta object]
+                          (let [[speed-x speed-y] (:speed object)
+                                [pos-x   pos-y]   (:position object)]
 
-(defn- move-object [ms-delta {:keys [position speed] :as object}]
-  (let [[speed-x speed-y] speed
-        [pos-x   pos-y]   position]
-    (assoc object :position [(+ pos-x (/ (* (/ ms-delta 1000) speed-x) pixels-per-unit))
-                             (+ pos-y (/ (* (/ ms-delta 1000) speed-y) pixels-per-unit))])))
+                            (assoc object :position [(+ pos-x (* delta speed-x max-speed))
+                                                     (+ pos-y (* delta speed-y max-speed))])))]
 
-(defn- update [ms-delta objects]
-  (->> objects
-       (map (partial move-object ms-delta))))
+  (assoc world :objects (map (partial update-position delta) (:objects world)))))
 
-(defn- tick [ms-delta {:keys [canvas objects] :as state}]
-  (let [new-state (assoc state :objects (update ms-delta objects))]
-    (renderer/draw canvas (:objects new-state))
-    new-state))
+(defn- update-loop [next-tick world frames-skipped]
+  (if (and (> (tick-count) next-tick) (< frames-skipped max-frames-skipped))
+    (recur (+ next-tick skip-ticks) (update-world (/ skip-ticks 1000) world) (inc frames-skipped))
+    [next-tick world]))
 
-(defn- game-loop [state]
-  (.setTimeout js/window (fn []
-                           (game-loop (tick (/ 1000 target-fps) state))) (/ 1000 target-fps)))
+(defn- game-loop [canvas next-tick world]
+  (let [[next-tick updated-world] (update-loop next-tick world 0)
+        interpolation (/ (- (+ (tick-count) skip-ticks) next-tick) skip-ticks)]
+    (renderer/draw canvas (:objects world) interpolation) 
+    (.setTimeout js/window #(game-loop canvas next-tick updated-world) 1)))
 
 (defn ^:export main []
   (init-controls)
-
-  (let [canvas (renderer/init)]
-    (game-loop (assoc initial-state :canvas canvas))))
+  (game-loop (renderer/init) (tick-count) initial-world))
