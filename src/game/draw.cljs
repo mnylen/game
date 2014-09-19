@@ -13,7 +13,10 @@
     (canvas/context-2d canvas-elem)))
 
 (defn draw [ctx objects]
+  (canvas/clear-rect ctx 0 0 1024 768)
+
   (doseq [object objects]
     (let [[width height] (:dimensions object)
           [x     y]      (:position object)]
+
       (canvas/fill-rect ctx x y width height))))

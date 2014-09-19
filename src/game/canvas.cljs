@@ -8,3 +8,6 @@
 
 (defn fill-rect [ctx x y width height]
   (.fillRect ctx x y width height))
+
+(defn clear-rect [ctx x y width height]
+  (.clearRect ctx x y width height))
