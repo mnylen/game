@@ -1,7 +1,8 @@
 (ns game.main
-  (:require [game.util :refer [log trace ]]
+  (:require [game.util :refer [log trace create-elem]]
             [game.draw :as renderer]
-            [game.constants :refer [ticks-per-second skip-ticks max-frames-skipped max-speed]]))
+            [game.constants :refer [ticks-per-second skip-ticks max-frames-skipped max-speed]]
+            [game.assets :refer [load-assets]]))
 
 (enable-console-print!)
 
@@ -81,5 +82,6 @@
     (.setTimeout js/window #(game-loop canvas next-tick updated-world) 1)))
 
 (defn ^:export main []
-  (init-controls)
-  (game-loop (renderer/init) (tick-count) initial-world))
+  (load-assets (fn []
+                 (init-controls)
+                 (game-loop (renderer/init) (tick-count) initial-world))))
