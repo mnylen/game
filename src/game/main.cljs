@@ -64,8 +64,8 @@
                           (let [[speed-x speed-y] (:speed object)
                                 [pos-x   pos-y]   (:position object)]
 
-                            (assoc object :position [(+ pos-x (* delta speed-x max-speed))
-                                                     (+ pos-y (* delta speed-y max-speed))])))]
+                            (assoc object :position [(+ pos-x (* delta speed-x max-speed 2))
+                                                     (+ pos-y (* delta speed-y max-speed 2))])))]
 
   (assoc new-world :objects (map (partial update-position delta) (:objects new-world)))))
 
