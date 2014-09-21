@@ -23,7 +23,7 @@
                           (swap! user-input conj [event (js->clj data :keywordize-keys true)]))))))
 
 (def initial-world {:objects [{:type         :dragon 
-                               :animation    :flying
+                               :animation    :flying-right
                                :anim-frame   0
                                :anim-time-ms 0
                                :state        :flying
@@ -70,16 +70,22 @@
   (condp = (:type object)
     :dragon (let [[speed-x speed-y] (:speed object)]
               (cond
-                (> speed-y 0.5)  :flying-down
-                (< speed-y -0.5) :flying-up
-                :else            :flying))
+                (and (>= speed-x 0) (> speed-y 0.5))  :flying-right-down
+                (and (>= speed-x 0) (< speed-y -0.5)) :flying-right-up
+                (and (< speed-x 0)  (> speed-y 0.5))  :flying-left-down
+                (and (< speed-x 0)  (< speed-y -0.5)) :flying-left-up
+                (< speed-x 0)                         :flying-left
+                (> speed-x 0)                         :flying-right
+                :else                                 (:animation object)))
     :none))
 
 (defn- progress-current-animation [delta object]
-  (let [anim-time-ms (+ (* 1000 delta) (:anim-time-ms object))
-        anim-frame   (:anim-frame object)]
+  (let [anim-time-ms      (+ (* 1000 delta) (:anim-time-ms object))
+        anim-frame        (:anim-frame object)
+        [speed-x speed-y] (:speed object)
+        speed             (Math/sqrt (* speed-x speed-x) (* speed-y speed-y))]
 
-    (if (> anim-time-ms 50)
+    (if (> anim-time-ms (/ 100 (+ 1 speed)))
       (merge object {:anim-frame (next-anim-frame anim-frame)
                      :anim-time-ms 0})
 

@@ -12,11 +12,13 @@
 (def dragon (load-image "/resources/images/dragon.gif"))
 
 (defn dragon-frame [animation frame]
-  (println animation frame)
   (let [row (condp = animation
-              :flying 0
-              :flying-down 1
-              :flying-up 7)]
+              :flying-right 0
+              :flying-right-up 7 
+              :flying-right-down 1
+              :flying-left 4
+              :flying-left-up 5
+              :flying-left-down 3)]
 
     [(* frame 75) (* row 70) 75 70]))
 
