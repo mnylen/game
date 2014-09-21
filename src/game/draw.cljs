@@ -16,8 +16,8 @@
     
     (canvas/context-2d canvas-elem)))
 
-(defn- draw-dragon [ctx pos-x pos-y anim-frame]
-  (let [[sprite-x sprite-y sprite-width sprite-height] (assets/dragon-frame 0 anim-frame)]
+(defn- draw-dragon [ctx pos-x pos-y animation anim-frame]
+  (let [[sprite-x sprite-y sprite-width sprite-height] (assets/dragon-frame animation anim-frame)]
     (canvas/draw-image ctx assets/dragon sprite-x sprite-y sprite-width sprite-height pos-x pos-y sprite-width sprite-height)))
 
 (defn draw [ctx objects interpolation]
@@ -31,4 +31,4 @@
           [ipos-x ipos-y]   [(+ pos-x (* speed-x interpolation)) (+ pos-y (* speed-y interpolation))]]
 
       (condp = (:type object)
-        :dragon (draw-dragon ctx ipos-x ipos-y (:anim-frame object))))))
+        :dragon (draw-dragon ctx ipos-x ipos-y (:animation object) (:anim-frame object))))))

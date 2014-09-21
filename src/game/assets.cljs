@@ -11,8 +11,14 @@
 
 (def dragon (load-image "/resources/images/dragon.gif"))
 
-(defn dragon-frame [row col]
-  [(* col 75) (* row 70) 75 70])
+(defn dragon-frame [animation frame]
+  (println animation frame)
+  (let [row (condp = animation
+              :flying 0
+              :flying-down 1
+              :flying-up 7)]
+
+    [(* frame 75) (* row 70) 75 70]))
 
 (def all-assets [background dragon])
 
