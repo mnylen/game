@@ -12,6 +12,8 @@
 (defn clear-rect [ctx x y width height]
   (.clearRect ctx x y width height))
 
-(defn draw-image [ctx img x y width height]
-  (println "drawing with: " x y width height)
-  (.drawImage ctx img x y width height))
+(defn draw-image
+  ([ctx img x y width height]
+   (.drawImage ctx img x y width height))
+  ([ctx img sx sy swidth sheight x y width height]
+   (.drawImage ctx img sx sy swidth sheight x y width height)))

@@ -9,7 +9,12 @@
 
 (def background (load-image "/resources/images/space-background.jpg"))
 
-(def all-assets [background])
+(def dragon (load-image "/resources/images/dragon.gif"))
+
+(defn dragon-frame [row col]
+  [(* col 75) (* row 70) 75 70])
+
+(def all-assets [background dragon])
 
 (defn load-assets [callback]
   (let [loaded?     #(aget % "loaded")

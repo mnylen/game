@@ -22,11 +22,13 @@
       (.on socket event (fn [data]
                           (swap! user-input conj [event (js->clj data :keywordize-keys true)]))))))
 
-(def initial-world {:objects [{:type      :dragon 
-                              :state      :flying
-                              :position   [512 384]
-                              :dimensions [30 30]
-                              :speed      [0 0]}]})
+(def initial-world {:objects [{:type         :dragon 
+                               :anim-frame   0
+                               :anim-time-ms 0
+                               :state        :flying
+                               :position     [512 384]
+                               :dimensions   [30 30]
+                               :speed        [0 0]}]})
 
 
 (defn- dequeue! [queue]
@@ -58,6 +60,22 @@
       nil         world
       (recur world (dequeue! user-input))))) ; ignore event, not supported
 
+(defn- next-anim-frame [current-anim-frame]
+  (if (= current-anim-frame 8)
+    0
+    (inc current-anim-frame)))
+
+(defn- update-animation [delta object]
+  (let [anim-time-ms (+ (* 1000 delta) (:anim-time-ms object))
+        anim-frame   (:anim-frame object)]
+
+    (println anim-time-ms)
+
+    (if (> anim-time-ms 200)
+      (merge object {:anim-frame (next-anim-frame anim-frame)
+                     :anim-time-ms 0})
+
+      (assoc object :anim-time-ms anim-time-ms))))
 
 (defn- update-world [delta world]
   (let [new-world       (apply-controls world)
@@ -67,8 +85,11 @@
 
                             (assoc object :position [(+ pos-x (* delta speed-x max-speed 2))
                                                      (+ pos-y (* delta speed-y max-speed 2))])))]
-
-  (assoc new-world :objects (map (partial update-position delta) (:objects new-world)))))
+        
+  (assoc new-world :objects (->> new-world
+                                 :objects
+                                 (map (partial update-position delta))
+                                 (map (partial update-animation delta))))))
 
 (defn- update-loop [next-tick world frames-skipped]
   (if (and (> (tick-count) next-tick) (< frames-skipped max-frames-skipped))
